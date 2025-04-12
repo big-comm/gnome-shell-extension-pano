@@ -1,0 +1,45 @@
+# Maintainer: Tales A. Mendonça (talesam@gmail.com)
+
+pkgname=gnome-shell-extension-pano
+pkgdesc="Next-gen Clipboard Manager for GNOME Shell (forked from -git package)"
+pkgver=$(date +%y.%m.%d)
+pkgrel=$(date +%H%M)
+arch=('any')
+license=('GPL-2.0-or-later')
+url="https://github.com/oae/gnome-shell-pano"
+depends=('gnome-shell>=45'
+         'libgda6'
+         'cogl'
+         'gsound')
+makedepends=('gobject-introspection'
+             'yarn'
+             'appstream'
+             'zip')
+provides=("$pkgname")
+source=("git+${url}.git")
+md5sums=('SKIP')
+
+prepare() {
+  cd "${srcdir}/gnome-shell-pano"
+  yarn install
+}
+
+build() {
+  cd "${srcdir}/gnome-shell-pano"
+  yarn build:package
+}
+
+package() {
+  cd "${srcdir}/gnome-shell-pano/dist"
+
+  local uuid=$(grep -Po '(?<="uuid": ")[^"]*' metadata.json)
+  local schema=$(grep -Po '(?<="settings-schema": ")[^"]*' metadata.json).gschema.xml
+  local destdir="${pkgdir}/usr/share/gnome-shell/extensions/${uuid}"
+
+  install -d "${destdir}"
+  bsdtar xvf "${uuid}.zip" -C "${destdir}/"
+  install -Dm644 "schemas/${schema}" -t "${pkgdir}/usr/share/glib-2.0/schemas/"
+
+  # Clean up schema directory after installation
+  rm -rf "${destdir}/schemas"
+}
