@@ -4,6 +4,7 @@ pkgname=gnome-shell-extension-pano
 pkgdesc="Next-gen Clipboard Manager for GNOME Shell (forked from -git package)"
 pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
+epoch=1
 arch=('any')
 license=('GPL-2.0-or-later')
 url="https://github.com/oae/gnome-shell-pano"
